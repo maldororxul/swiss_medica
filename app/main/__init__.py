@@ -8,3 +8,4 @@ from app.main.routes import main
 from app.main.routes import socket
 from app.main.routes import telegram
 from app.main.routes import whatsapp
+from app.main.routes import offer
