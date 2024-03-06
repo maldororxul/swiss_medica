@@ -80,6 +80,21 @@ class TawkController:
     """ Класс для управления чатами Tawk, интеграции с Amo """
 
     def handle(self, request: Request):
+        """ Прилетают примерно такие данные
+        {
+            'questions': [
+                {'label': 'Name', 'answer': '...'},
+                {'label': 'Email', 'answer': '...'},
+                {'label': 'Phone', 'answer': '...'},
+                {'label': 'Your question', 'answer': '...'}
+            ],
+            'name': '...',
+            'email': '...',
+            'phone': '...',
+            'submittedFrom': 'https://...',
+            'referrer': ''
+        }
+        """
         data = request.json or {}
         # print('DATA FROM TAWK', data)
         lead_data = None
@@ -108,7 +123,7 @@ class TawkController:
                 continue
             url = question.get('answer')
             return url
-        return None
+        return data.get('submittedFrom')
 
     @staticmethod
     def __get_customer_data(person_dict: Dict) -> [Tuple[str, str, str, str]]:
@@ -137,11 +152,31 @@ class TawkController:
         return None, None
 
     def __handle_offline_form_event(self, site: str, data: Dict) -> Optional[Dict]:
+        """ Прилетают примерно такие данные
+        {
+            'questions': [
+                {'label': 'Name', 'answer': '...'},
+                {'label': 'Email', 'answer': '...'},
+                {'label': 'Phone', 'answer': '...'},
+                {'label': 'Your question', 'answer': '...'}
+            ],
+            'name': '...',
+            'email': '...',
+            'phone': '...',
+            'submittedFrom': 'https://...',
+            'referrer': ''
+        }
+        """
         # зная сайт, попытаемся вытащить из общего конфига TAWK конфиг конкретного канала
         chat_name, config = self.__get_config_by_site(site=site)
         if not config:
             return None
         utm_dict = self.__get_utm_dict_from_url(url=site)
+        msg = None
+        for question in data.get('questions') or []:
+            if 'question' in question['label'].lower():
+                msg = question['answer']
+                break
         return {
             'chat_name': chat_name,
             'name': data.get('name'),
@@ -152,6 +187,7 @@ class TawkController:
             'utm_dict': utm_dict,
             'responsible_user_id': 0,
             'tawk_data': {},
+            'msg': msg
         }
 
     def __handle_chat_end_event(self, chat_name: str, channel_id: str, chat_id: str) -> Optional[Dict]:
@@ -198,6 +234,7 @@ class TawkController:
                 'utm_dict': {},
                 'responsible_user_id': 0,
                 'tawk_data': {},
+                'msg': ... (optional)
             }
         """
         chat_name = data.get('chat_name')
@@ -233,7 +270,7 @@ class TawkController:
                 lead_id = int(added_lead_data[0]['id'])
             except:
                 pass
-        messages = tawk_data.get('messages')
+        messages = tawk_data.get('messages') or data.get('msg')
         if lead_id and messages:
             amo_client.add_note_simple(entity_id=lead_id, text=messages)
 

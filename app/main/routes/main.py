@@ -10,6 +10,7 @@ from app.amo.processor.processor import GoogleSheets
 from app.google_api.client import GoogleAPIClient
 from app.main import bp
 from app.main.arrival.handler import waiting_for_arrival
+from app.main.leads_insurance.handler import LeadsInsurance
 from app.main.processors import DATA_PROCESSOR
 from app.main.routes.utils import get_data_from_post_request, get_args_from_url
 from app.main.tasks import SchedulerTask
@@ -259,6 +260,18 @@ def startstemcells_lead():
         'email': form_data.get('email') or '',
         'msg': form_data.get('diagnosis') or form_data.get('message') or form_data.get('msg') or ''
     })
+    # проверяем лид на спам
+    is_spam = False
+    phone = clear_phone(form_data.get('phone') or '')
+    email = form_data.get('email') or ''
+    msg = form_data.get('diagnosis') or form_data.get('message') or form_data.get('msg') or ''
+    try:
+        is_spam = LeadsInsurance().is_spam(line={'phone': phone, 'email': email, 'msg': msg})
+    except Exception as exc:
+        print('failed to perform spam check', exc)
+    if is_spam:
+        print('spam lead detected')
+        return Response(status=200)
     # для части форм сделки в Amo не создаем (флаг 'l' != 1)
     if not form_config or form_config['l'] != 1:
         print('startstemcells_lead config error')
@@ -279,9 +292,9 @@ def startstemcells_lead():
         headers=data.get('headers') or {},
         cookies=data.get('cookies') or {},
         name=form_data.get('name'),
-        phone=clear_phone(form_data.get('phone') or ''),
-        email=form_data.get('email') or '',
-        diagnosis=form_data.get('diagnosis') or form_data.get('message') or form_data.get('msg') or '',
+        phone=phone,
+        email=email,
+        diagnosis=msg,
         utm_dict=utm_dict
     )
     return Response(status=200)
@@ -392,6 +405,18 @@ def cellulestaminali_lead():
         'email': form_data.get('email') or '',
         'msg': form_data.get('message') or ''
     })
+    # проверяем лид на спам
+    is_spam = False
+    phone = clear_phone(form_data.get('phone') or '')
+    email = form_data.get('email') or ''
+    msg = form_data.get('diagnosis') or form_data.get('message') or form_data.get('msg') or ''
+    try:
+        is_spam = LeadsInsurance().is_spam(line={'phone': phone, 'email': email, 'msg': msg})
+    except Exception as exc:
+        print('failed to perform spam check', exc)
+    if is_spam:
+        print('spam lead detected')
+        return Response(status=200)
     utm_dict = {
         'utm_source': form_data.get('utm_source') or '',
         'utm_medium': form_data.get('utm_medium') or '',
@@ -408,9 +433,9 @@ def cellulestaminali_lead():
         headers=data.get('headers') or {},
         cookies=data.get('cookies') or {},
         name=form_data.get('name'),
-        phone=clear_phone(form_data.get('phone') or ''),
-        email=form_data.get('email') or '',
-        diagnosis=form_data.get('message') or '',
+        phone=phone,
+        email=email,
+        diagnosis=msg,
         utm_dict=utm_dict
     )
     return Response(status=200)

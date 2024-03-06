@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer Constructor</title>
+    <!-- Ссылка на ваш CSS-файл будет здесь -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/offer.css') }}">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="collapsible-container">
+                <div class="collapsible-header">Offer Info</div>
+                <div class="collapsible-content">
+                    <!-- Выбор шаблона оффера -->
+                    <div class="template-load-container">
+                        <div class="template-selection">
+                            <label for="template">Template:</label>
+                            <select id="template"></select>
+                        </div>
+                        <button id="load_offer" class="load-offer-button">Load Offer</button>
+                    </div>
+                    <!-- Выбор языка -->
+                    <div class="language-selection">
+                        <label for="language">Language:</label>
+                        <select id="language"></select>
+                    </div>
+                    <!-- Выбор клиники -->
+                    <div class="clinic-selection">
+                        <label for="clinic">Clinic:</label>
+                        <select id="clinic"></select>
+                    </div>
+                    <input type="number" id="days_in_clinic" placeholder="Days in Clinic">
+                    <!-- Выбор менеджера -->
+                    <div class="advisor-selection">
+                        <label for="advisor">Advisor:</label>
+                        <select id="advisor"></select>
+                    </div>
+                    <!-- Папка пациента -->
+                    <input type="text" id="patient_folder" placeholder="Patient Folder">
+                </div>
+            </div>
+            <!-- Информация о пациенте -->
+            <div class="collapsible-container">
+                <div class="collapsible-header">Patient</div>
+                <div class="collapsible-content">
+                    <div class="patient-info">
+                        <input type="text" id="contact_id" placeholder="Contact ID" pattern="\d*">
+                        <input type="text" id="patient_name" placeholder="Patient Name">
+                        <input type="date" id="birth_date">
+<!--                        <input type="number" id="age" readonly>-->
+                        <div class="gender">
+                            <input type="radio" id="gender_male" name="gender" value="male">
+                            <label for="gender_male">Male</label>
+                            <input type="radio" id="gender_female" name="gender" value="female">
+                            <label for="gender_female">Female</label>
+                        </div>
+                        <input type="number" id="weight" placeholder="Weight (kg)">
+                        <input type="text" id="duration" placeholder="Duration">
+                        <textarea id="symptoms" placeholder="Symptoms"></textarea>
+                        <textarea id="treatment_history" placeholder="Treatment History"></textarea>
+                        <textarea id="additional_diseases" placeholder="Additional Diseases"></textarea>
+                        <textarea id="allergies" placeholder="Allergies"></textarea>
+                        <textarea id="blood_type" placeholder="Blood Type"></textarea>
+                        <input type="text" id="discount" placeholder="Discount (%)">
+                        <!-- Выбор диагноза -->
+                        <div class="diagnosis-selection">
+                            <label for="diagnosis">Diagnosis:</label>
+                            <select id="diagnosis"></select>
+                        </div>
+                        <textarea id="diagnosis_details" placeholder="Diagnosis Details"></textarea>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <main class="main-content">
+            <!-- Секция для выбора процедур -->
+            <div class="collapsible-container">
+                <div class="collapsible-header">Procedures</div>
+                <div class="collapsible-content">
+                    <section class="procedures">
+                        <!-- Выпадающие списки для выбора процедур -->
+                        <div class="dropdown" id="therapy_type_dropdown">
+                            <label for="therapy_type">Therapy Type:</label>
+                            <select id="therapy_type"></select>
+                        </div>
+                        <div class="dropdown" id="type_of_administration_dropdown">
+                            <label for="type_of_administration">Type of Administration:</label>
+                            <select id="type_of_administration"></select>
+                        </div>
+                        <div class="dropdown" id="active_substance_dropdown">
+                            <label for="active_substance">Active Substance:</label>
+                            <select id="active_substance"></select>
+                        </div>
+                        <div class="dropdown" id="physiotherapy_dropdown">
+                            <label for="physiotherapy">Physiotherapy:</label>
+                            <select id="physiotherapy"></select>
+                        </div>
+                        <div class="dropdown" id="examination_package_dropdown">
+                            <label for="examination_package">Examination Package:</label>
+                            <select id="examination_package"></select>
+                        </div>
+                        <!-- Спинбокс для количества и кнопка добавления -->
+                        <div class="quantity-add-container">
+                            <label for="procedure_quantity">Number of Procedures:</label>
+                                <div class="quantity-controls">
+                                    <button type="button" class="quantity-minus">-</button>
+                                    <input type="number" id="procedure_quantity" value="1" min="1" class="procedure-quantity">
+                                    <button type="button" class="quantity-plus">+</button>
+                                    <button id="add_procedure" class="add-procedure-button">Add</button>
+                                </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <!-- Корзина с выбранными процедурами -->
+            <section class="basket">
+                <div class="template-save-container">
+                    <input type="text" id="template_name" placeholder="Template Name" class="template-name-input">
+                    <button id="save_offer" class="save-offer-button">Save Offer</button>
+                </div>
+                <table id="selected_procedures">
+                    <thead>
+                        <tr>
+                            <th>Procedure</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Строки с выбранными процедурами будут добавляться здесь -->
+                    </tbody>
+                </table>
+            </section>
+            <!-- Кнопки действий -->
+                <div class="action-buttons">
+                    <button id="clear_procedures">Clear All</button>
+                    <button id="build_offer">Build Offer</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Div для отображения сообщений пользователю -->
+    <div id="user_messages" class="user-messages"></div>
+
+    <!-- Здесь будет ваш JavaScript -->
+    <script src="{{ url_for('static', filename='js/offer.js') }}"></script>
+</body>
+</html>

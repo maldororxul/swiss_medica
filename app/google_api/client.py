@@ -38,7 +38,13 @@ WEEKDAYS = {
 class GoogleAPIClient:
     """ API-клиент для работы с сервисами Google (в частности: с Google Sheets) """
 
-    def __init__(self, book_id: str, sheet_title: str, start_col: str = 'A', last_col='AY'):
+    def __init__(
+        self,
+        book_id: Optional[str] = None,
+        sheet_title: Optional[str] = None,
+        start_col: str = 'A',
+        last_col='AY'
+    ):
         """
         Args:
             book_id: текстовый идентификатор книги
@@ -57,6 +63,18 @@ class GoogleAPIClient:
     def sheet_id(self) -> str:
         """ Идентификатор листа """
         return self.__get_sheet_id(sheet_title=self.__sheet_title)
+
+    @property
+    def sheets(self) -> Dict:
+        """
+        Returns:
+            Словарь идентификаторов и имен всех листов книги
+        """
+        collection = {}
+        for sheet in self.sheets_service.spreadsheets().get(spreadsheetId=self.__book_id).execute().get('sheets'):
+            props = sheet['properties']
+            collection[props['sheetId']] = props['title']
+        return collection
 
     def clear_all_except_title(self):
         """ Очищает лист, оставляя только заголовки """
@@ -107,26 +125,36 @@ class GoogleAPIClient:
             dictionary: True - в виде списка словарей
 
         Returns:
-            список словарей или список списков с данными листа
+            список словарей или список списков с данными с листа
         """
-        response = self.sheets_service.spreadsheets().values().get(
-            spreadsheetId=self.__book_id,
-            range=f'{self.__sheet_title}!A1:{self.__last_col}').execute()
-        values = response.get('values', [])
-        # результат в формате списка списков
-        if not dictionary:
-            return values
-        # результат в формате списка словарей
-        result = []
-        for r in range(1, len(values)):
-            line = dict()
-            for n, k in enumerate(values[0]):
-                try:
-                    line[k] = values[r][n]
-                except:
-                    pass
-            result.append(line)
-        return result
+        res = []
+        # Call the Sheets API
+        try:
+            result = self.sheets_service.spreadsheets().values().get(
+                spreadsheetId=self.__book_id,
+                range=f'{self.__sheet_title}!A1:{self.__last_col}').execute()
+            values = result.get('values', [])
+        except Exception as e:
+            print(e)
+            return res
+
+        if not values:
+            return res
+        else:
+            for row in values:
+                res.append(row)
+            if dictionary and len(res) > 0:
+                d_res = list()
+                for r in range(1, len(res)):
+                    line = dict()
+                    for n, k in enumerate(res[0]):
+                        try:
+                            line[k] = res[r][n]
+                        except:
+                            pass
+                    d_res.append(line)
+                return d_res
+        return res
 
     def paint_cells(self, sheet_id: str, red: float = 0, green: float = 0, blue: float = 0):
         """ Закрашивает A1:A3 на указанном листе в заданный цвет

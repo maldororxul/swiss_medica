@@ -41,6 +41,11 @@ class LeadsInsurance:
             amo_client = API_CLIENT.get(self.__branch)()
             self.__start(amo_client=amo_client)
 
+    def is_spam(self, line):
+        """ Из лида делаем line: {'phone': ..., 'email': ..., 'msg': ...} """
+        spam_rules = self.__build_spam_rules()
+        return self.__is_spam(rules=spam_rules, line=line)
+
     def __start(self, amo_client):
         leads_google_client = GoogleAPIClient(book_id=self.__book_id, sheet_title='Leads')
         collection = leads_google_client.get_sheet()
@@ -112,6 +117,10 @@ class LeadsInsurance:
             message = ''
             for lead in saved_leads[i*step:i*step+step]:
                 text = lead.get('msg') or ''
+                if not lead.get('source'):
+                    continue
+                if not lead.get('phone') and lead.get('email'):
+                    continue
                 if len(text) > 3500:
                     text = f"{text[:3000]} <...>"
                 item = f"Source: {lead.get('source')}\n" \

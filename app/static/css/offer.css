@@ -1,0 +1,260 @@
+/* Main Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #242424;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    justify-content: space-between;
+}
+
+.sidebar, .main-content {
+    padding: 10px;
+    margin: 10px;
+}
+
+.sidebar {
+    flex: 1 1 300px;
+}
+
+.main-content {
+    flex: 2 1 600px;
+}
+
+/* Form and Input Elements Styling */
+input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: #fff;
+}
+
+/* Gender Alignment */
+.gender {
+    display: flex;
+}
+
+.gender label {
+    margin-right: 10px;
+    margin-left: 5px;
+    margin-top: 6px;
+    color: #fff;
+}
+
+/* Buttons */
+button {
+    background-color: #444;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    width: 150px;
+}
+
+button:hover {
+    background-color: #666;
+}
+
+.load-offer-button {
+    background-color: #008CBA;
+    color: white;
+}
+
+.load-offer-button {
+    margin-top: 20px;
+}
+
+.add-procedure-button:hover, .load-offer-button:hover {
+    background-color: #007B9E;
+}
+
+/* Basket Styling */
+.basket ul {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.basket li {
+    background-color: #333;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.action-buttons {
+	margin-top: 10px;
+}
+
+/* User Messages */
+.user-messages {
+    padding: 10px;
+    margin: 20px 0;
+    border-radius: 4px;
+    display: none;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar, .main-content {
+        flex: 1 1 100%;
+    }
+}
+
+/* Collapsible Sections */
+.collapsible-content {
+    max-height: 0;
+    transition: max-height 0.3s ease-in-out;
+    overflow-y: auto;
+}
+
+.collapsible-container .is-open {
+    max-height: 500px;
+}
+
+.collapsible-header {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #6a0dad; /* Changed to purple shade */
+    margin-top: 10px;
+    line-height: 1.5;
+    color: #fff;
+}
+
+.collapsible-header:hover {
+    background-color: #7b1fa2; /* Darker purple shade for hover */
+}
+
+#selected_procedures {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#selected_procedures thead th {
+    text-align: left;
+    background-color: #222;
+    color: #fff;
+}
+
+#selected_procedures th, #selected_procedures td {
+    border: 1px solid #555;
+    padding: 8px;
+    color: #fff;
+}
+
+.delete-procedure {
+    background-color: #ff4d4d;
+}
+
+.delete-procedure:hover {
+    background-color: #ff0000;
+}
+
+.quantity-add-container label {
+    margin-right: 10px;
+}
+
+.template-load-container, .language-selection, .clinic-selection, .advisor-selection, .template-save-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3px 0;
+}
+
+.template-selection, .language-selection, .clinic-selection, .advisor-selection, .diagnosis-selection {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-controls button {
+    background-color: #444;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    line-height: 30px;
+    padding: 0;
+}
+
+.quantity-controls button:hover {
+    background-color: #555;
+}
+
+.procedure-quantity {
+    max-width: 60px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
+
+#add_procedure {
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    width: 150px;
+}
+
+#add_procedure:hover {
+    background-color: #007B9E;
+    color: white;
+}
+
+/* Скрыть стрелки увеличения/уменьшения количества для Webkit-браузеров */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Скрыть стрелки увеличения/уменьшения количества для Firefox */
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+label {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 2px;
+    color: #fff;
+}
+
+.save-offer-button {
+    background-color: #28a745;
+    margin-left: 5px;
+}
+
+.save-offer-button:hover {
+    background-color: #218838;
+}
