@@ -125,64 +125,36 @@ class GoogleAPIClient:
             dictionary: True - в виде списка словарей
 
         Returns:
-            список словарей или список списков с данными листа
+            список словарей или список списков с данными с листа
         """
-        response = self.sheets_service.spreadsheets().values().get(
-            spreadsheetId=self.__book_id,
-            range=f'{self.__sheet_title}!A1:{self.__last_col}').execute()
-        values = response.get('values', [])
-        # результат в формате списка списков
-        if not dictionary:
-            return values
-        # результат в формате списка словарей
-        result = []
-        for r in range(1, len(values)):
-            line = dict()
-            for n, k in enumerate(values[0]):
-                try:
-                    line[k] = values[r][n]
-                except:
-                    pass
-            result.append(line)
-        return result
+        res = []
+        # Call the Sheets API
+        try:
+            result = self.sheets_service.spreadsheets().values().get(
+                spreadsheetId=self.__book_id,
+                range=f'{self.__sheet_title}!A1:{self.__last_col}').execute()
+            values = result.get('values', [])
+        except Exception as e:
+            print(e)
+            return res
 
-    # def get_sheet(self, dictionary: bool = True) -> Union[List[Dict], List[List]]:
-    #     """ Получить данные с листа
-    #
-    #     Args:
-    #         dictionary: True - в виде списка словарей
-    #
-    #     Returns:
-    #         список словарей или список списков с данными с листа
-    #     """
-    #     res = []
-    #     # Call the Sheets API
-    #     try:
-    #         result = self.sheets_service.spreadsheets().values().get(
-    #             spreadsheetId=self.__book_id,
-    #             range=f'{self.__sheet_title}!A1:{self.__last_col}').execute()
-    #         values = result.get('values', [])
-    #     except Exception as e:
-    #         print(e)
-    #         return res
-    #
-    #     if not values:
-    #         return res
-    #     else:
-    #         for row in values:
-    #             res.append(row)
-    #         if dictionary and len(res) > 0:
-    #             d_res = list()
-    #             for r in range(1, len(res)):
-    #                 line = dict()
-    #                 for n, k in enumerate(res[0]):
-    #                     try:
-    #                         line[k] = res[r][n]
-    #                     except:
-    #                         pass
-    #                 d_res.append(line)
-    #             return d_res
-    #     return res
+        if not values:
+            return res
+        else:
+            for row in values:
+                res.append(row)
+            if dictionary and len(res) > 0:
+                d_res = list()
+                for r in range(1, len(res)):
+                    line = dict()
+                    for n, k in enumerate(res[0]):
+                        try:
+                            line[k] = res[r][n]
+                        except:
+                            pass
+                    d_res.append(line)
+                return d_res
+        return res
 
     def paint_cells(self, sheet_id: str, red: float = 0, green: float = 0, blue: float = 0):
         """ Закрашивает A1:A3 на указанном листе в заданный цвет

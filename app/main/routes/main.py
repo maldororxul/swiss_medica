@@ -266,7 +266,7 @@ def startstemcells_lead():
     email = form_data.get('email') or ''
     msg = form_data.get('diagnosis') or form_data.get('message') or form_data.get('msg') or ''
     try:
-        is_spam = LeadsInsurance().is_spam(line={'phone': phone, 'email': email, 'msg': msg})
+        is_spam = LeadsInsurance(branch='swissmedica').is_spam(line={'phone': phone, 'email': email, 'msg': msg})
     except Exception as exc:
         print('failed to perform spam check', exc)
     if is_spam:
@@ -411,7 +411,7 @@ def cellulestaminali_lead():
     email = form_data.get('email') or ''
     msg = form_data.get('diagnosis') or form_data.get('message') or form_data.get('msg') or ''
     try:
-        is_spam = LeadsInsurance().is_spam(line={'phone': phone, 'email': email, 'msg': msg})
+        is_spam = LeadsInsurance(branch='swissmedica').is_spam(line={'phone': phone, 'email': email, 'msg': msg})
     except Exception as exc:
         print('failed to perform spam check', exc)
     if is_spam:
