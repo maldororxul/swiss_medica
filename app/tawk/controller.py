@@ -250,7 +250,7 @@ class TawkController:
         else:
             # лид не найден - создаем
             lead_added = amo_client.add_lead_simple(
-                title=f'TEST! Lead from Tawk: {data.get("name")}',
+                title=f'Lead from Tawk: {data.get("name")}',
                 name=data.get("name"),
                 tags=['Tawk', chat_name],
                 referer=data.get('referer'),
