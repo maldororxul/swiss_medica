@@ -126,7 +126,7 @@ class TawkController:
         return data.get('submittedFrom')
 
     @staticmethod
-    def __get_customer_data(person_dict: Dict) -> [Tuple[str, str, str, str]]:
+    def __get_customer_data(person_dict: Dict) -> [Tuple[str, str, str, str, str]]:
         # имя и номер пациента
         name_data = person_dict.get('name')
         name = f"{name_data.get('first') or ''} {name_data.get('last') or ''}".strip()
@@ -138,8 +138,10 @@ class TawkController:
             return None
         phone = clear_phone(phones_data[0])
         email = emails_data[0]
-        referer = (person_dict.get('customAttributes') or {}).get('ref')
-        return name, phone, email, referer
+        attrs = person_dict.get('customAttributes') or {}
+        referer = attrs.get('ref')
+        ym_uid = attrs.get('ymuid')
+        return name, phone, email, referer, ym_uid
 
     @staticmethod
     def __get_config_by_site(site: str) -> Tuple:
@@ -172,6 +174,7 @@ class TawkController:
         if not config:
             return None
         utm_dict = self.__get_utm_dict_from_url(url=site)
+        utm_dict['ym_cid'] = data.get('ymuid')
         msg = None
         for question in data.get('questions') or []:
             if 'question' in question['label'].lower():
@@ -183,7 +186,7 @@ class TawkController:
             'phone': data.get('phone'),
             'email': data.get('email'),
             # referer - это кастомный атрибут, передаваемый при загрузке виджета чата, прокидывается вручную
-            'referer': data.get('referer'),
+            'referer': data.get('referrer') or data.get('referer'),
             'utm_dict': utm_dict,
             'responsible_user_id': 0,
             'tawk_data': {},
@@ -199,11 +202,12 @@ class TawkController:
         tawk_data = self.__get_tawk_data(channel_id=channel_id, chat_id=chat_id, branch=branch)
         if not tawk_data:
             return None
-        name, phone, email, referer = self.__get_customer_data(person_dict=tawk_data.get('person') or {})
+        name, phone, email, referer, ym_uid = self.__get_customer_data(person_dict=tawk_data.get('person') or {})
         if not phone or not email:
             return None
         # разбираем utm-метки из source
         utm_dict = self.__get_utm_dict_from_url(url=tawk_data.get('source'))
+        utm_dict['ym_cid'] = ym_uid
         # определяем идентификатор ответственного пользователя
         responsible_user_id = self.__get_responsible_user_id(
             manager_id=tawk_data.get('manager').get('id'),
@@ -302,7 +306,9 @@ class TawkController:
 
     @staticmethod
     def __get_utm_dict_from_url(url: Optional[str]) -> Dict:
-        if url:
-            parsed_url = urlparse(url)
-            return parse_qs(parsed_url.query)
-        return {}
+        if not url:
+            return {}
+        parsed_url = urlparse(url)
+        query_params = parse_qs(parsed_url.query)
+        # Берем первый элемент каждого списка для каждого ключа
+        return {k: v[0] for k, v in query_params.items()}
